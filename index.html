@@ -272,6 +272,35 @@ tr:hover td{background:#faf9f7}
   body{background:#fff}
   .receipt-modal{box-shadow:none;max-width:100%}
 }
+
+/* ====== DEVIS & FACTURES ====== */
+.devis-type-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px}
+.devis-type-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;transition:box-shadow .2s}
+.devis-type-card:hover{box-shadow:var(--sh-lg)}
+.devis-type-card-icon{font-size:36px;margin-bottom:10px}
+.devis-type-card-title{font-size:14px;font-weight:600;margin-bottom:6px;color:var(--text)}
+.devis-type-card-desc{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:14px}
+.fp-table-wrap{overflow-x:auto;margin:10px 0}
+.fp-table{width:100%;border-collapse:collapse;font-size:13px;min-width:480px}
+.fp-table th{background:#2D6A4F;color:#fff;padding:7px 10px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.fp-table td{padding:6px 8px;border:1px solid var(--border);vertical-align:middle}
+.fp-table input{width:100%;border:none;background:transparent;font-size:13px;font-family:'DM Sans',sans-serif;padding:2px 4px;outline:none;color:var(--text)}
+.fp-table tr:nth-child(even) td{background:var(--surface2)}
+.devis-section-title{font-size:11px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 8px;padding-bottom:4px;border-bottom:2px solid var(--accent-light)}
+.devis-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:500px){.devis-form-grid{grid-template-columns:1fr}}
+.devis-result-card{background:var(--surface2);border-radius:var(--rs);padding:12px 14px;margin-top:6px}
+.devis-result-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--border)}
+.devis-result-row:last-child{border-bottom:none}
+.devis-result-row.total{font-weight:700;color:var(--accent);padding-top:8px;border-top:2px solid var(--border);border-bottom:none;margin-top:4px}
+.devis-result-row.benef-pos{font-weight:700;color:var(--accent);font-size:15px;padding-top:8px}
+.devis-result-row.benef-neg{font-weight:700;color:var(--danger);font-size:15px;padding-top:8px}
+.devis-kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.devis-kpi{border-radius:var(--rs);padding:8px 12px}
+.devis-kpi-label{font-size:11px;font-weight:600;margin-bottom:3px}
+.devis-kpi-val{font-size:17px;font-weight:700;font-family:'DM Mono',monospace}
+.modal-xl{max-width:660px!important}
+
 </style>
 </head>
 <body>
@@ -323,6 +352,7 @@ tr:hover td{background:#faf9f7}
   <button class="tab-btn" onclick="showTab('bilan',this)">📊 Bilan</button>
   <button class="tab-btn" onclick="showTab('clients',this)">👥 Clients</button>
   <button class="tab-btn" onclick="showTab('params',this)">⚙️ Paramètres</button>
+  <button class="tab-btn" onclick="showTab('devis',this)">📄 Devis</button>
 </nav>
 
 <!-- ========== PAGE COMMANDES ========== -->
@@ -575,6 +605,35 @@ tr:hover td{background:#faf9f7}
 </div>
 
 <!-- ========== MODAL COMMANDE ========== -->
+
+<!-- ========== PAGE DEVIS & FACTURES ========== -->
+<div class="page" id="tab-devis">
+  <div class="data-info-bar" style="margin-bottom:14px">
+    <span>💡</span>
+    <span>Choisissez un type de document. Les calculs sont automatiques. Imprimez ou sauvegardez en PDF depuis votre navigateur.</span>
+  </div>
+  <div class="devis-type-grid">
+    <div class="devis-type-card" onclick="openDevis('fp')">
+      <div class="devis-type-card-icon">🧾</div>
+      <div class="devis-type-card-title">Facture Pro-Forma Spéciale</div>
+      <div class="devis-type-card-desc">Devis libre avec tableau de désignations. Style Le Partenaire des Éleveurs avec votre logo.</div>
+      <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center">Créer une facture</button>
+    </div>
+    <div class="devis-type-card" onclick="openDevis('pondeuses')">
+      <div class="devis-type-card-icon">🥚</div>
+      <div class="devis-type-card-title">Devis Poules Pondeuses</div>
+      <div class="devis-type-card-desc">Devis complet : investissements, charges, recettes et bénéfice net calculés automatiquement.</div>
+      <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center">Générer un devis</button>
+    </div>
+    <div class="devis-type-card" onclick="openDevis('chairs')">
+      <div class="devis-type-card-icon">🍗</div>
+      <div class="devis-type-card-title">Devis Poulets de Chair</div>
+      <div class="devis-type-card-desc">Devis estimatif par bande avec projection annuelle sur N bandes.</div>
+      <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center">Générer un devis</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-commande">
   <div class="modal">
     <div class="modal-title" id="modal-cmd-title">🐥 Nouvelle commande</div>
@@ -819,6 +878,110 @@ tr:hover td{background:#faf9f7}
       <button class="btn" onclick="dismissBackupReminder()">Plus tard</button>
     </div>
     <div style="font-size:11px;color:var(--text3);margin-top:14px">Rappel tous les 7 jours</div>
+  </div>
+</div>
+
+
+<!-- ========== MODAL FACTURE PRO-FORMA ========== -->
+<div class="modal-overlay" id="modal-fp">
+  <div class="modal modal-xl">
+    <div class="modal-title">🧾 Facture Pro-Forma Spéciale</div>
+    <div class="devis-form-grid" style="margin-bottom:12px">
+      <div class="form-group"><label>Titre du devis *</label><input type="text" class="form-input" id="fp-titre" placeholder="ex: DEVIS DE BÂTIMENT DE 360m²"></div>
+      <div class="form-group"><label>Date d'émission</label><input type="date" class="form-input" id="fp-date"></div>
+      <div class="form-group"><label>Nom du client</label><input type="text" class="form-input" id="fp-client" placeholder="ex: Mme. Coulibaly" list="dl-clients"></div>
+      <div class="form-group"><label>Contact client</label><input type="tel" class="form-input" id="fp-contact" placeholder="(+225) 07 00 00 00 00"></div>
+    </div>
+    <div class="devis-section-title">Tableau des désignations</div>
+    <div class="fp-table-wrap">
+      <table class="fp-table" id="fp-table">
+        <thead><tr>
+          <th style="width:56px">Qtés</th>
+          <th>Désignations</th>
+          <th style="width:110px">Prix unitaire</th>
+          <th style="width:110px">Montant (FCFA)</th>
+          <th style="width:36px"></th>
+        </tr></thead>
+        <tbody id="fp-tbody"></tbody>
+      </table>
+    </div>
+    <button class="btn btn-sm" onclick="addFPRow()" style="margin-top:6px">+ Ajouter une ligne</button>
+    <div class="devis-form-grid" style="margin-top:12px">
+      <div class="form-group"><label>Prix d'achat total (FCFA)</label><input type="text" class="form-input" id="fp-achat-total" readonly style="color:var(--accent);font-weight:600;background:var(--surface2)"></div>
+      <div class="form-group"><label>Main d'œuvre (FCFA)</label><input type="number" class="form-input" id="fp-mdo" placeholder="0" min="0" oninput="calcFP()"></div>
+    </div>
+    <div class="form-total">
+      <div><div class="form-total-label">TOTAL GÉNÉRAL</div><div class="form-total-value" id="fp-total-display">0 FCFA</div></div>
+      <div style="text-align:right"><div class="form-total-label">Lignes saisies</div><div class="form-total-value" id="fp-rows-count" style="font-size:16px">0</div></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('fp')">Fermer</button>
+      <button class="btn btn-primary" onclick="printFP()">🖨️ Imprimer / PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODAL DEVIS PONDEUSES ========== -->
+<div class="modal-overlay" id="modal-pondeuses">
+  <div class="modal modal-xl">
+    <div class="modal-title">🥚 Devis Poules Pondeuses</div>
+    <div class="devis-section-title">Informations client</div>
+    <div class="devis-form-grid">
+      <div class="form-group"><label>Nom du client</label><input type="text" class="form-input" id="pnd-client" placeholder="ex: M. LACINE FOFANA" list="dl-clients"></div>
+      <div class="form-group"><label>Contact</label><input type="tel" class="form-input" id="pnd-contact" placeholder="+225 07 67 57 12 23"></div>
+      <div class="form-group"><label>Date</label><input type="date" class="form-input" id="pnd-date"></div>
+      <div class="form-group"><label>Lieu</label><input type="text" class="form-input" id="pnd-lieu" placeholder="Abidjan"></div>
+    </div>
+    <div class="devis-section-title">Hypothèses de travail</div>
+    <div class="devis-form-grid">
+      <div class="form-group"><label>Effectif initial (poussins)</label><input type="number" class="form-input" id="pnd-effectif" value="10000" min="1" oninput="calcPondeuses()"></div>
+      <div class="form-group"><label>Prix poussin d'un jour (FCFA)</label><input type="number" class="form-input" id="pnd-prix-poussin" value="1150" oninput="calcPondeuses()"></div>
+      <div class="form-group"><label>Mortalité phase 1 — 1 à 21 sem (%)</label><input type="number" class="form-input" id="pnd-mort1" value="5" min="0" max="100" oninput="calcPondeuses()"></div>
+      <div class="form-group"><label>Mortalité phase 2 — 21 à 76 sem (%)</label><input type="number" class="form-input" id="pnd-mort2" value="5" min="0" max="100" oninput="calcPondeuses()"></div>
+      <div class="form-group"><label>Nombre d'œufs par poule</label><input type="number" class="form-input" id="pnd-oeufs" value="295" oninput="calcPondeuses()"></div>
+      <div class="form-group"><label>Prix moyen de l'œuf (FCFA)</label><input type="number" class="form-input" id="pnd-prix-oeuf" value="80" oninput="calcPondeuses()"></div>
+      <div class="form-group"><label>Prix de vente à la réforme (FCFA)</label><input type="number" class="form-input" id="pnd-prix-reforme" value="4000" oninput="calcPondeuses()"></div>
+      <div class="form-group"><label>Densité (poussins / m²)</label><input type="number" class="form-input" id="pnd-densite" value="5" min="1" oninput="calcPondeuses()"></div>
+    </div>
+    <div class="devis-section-title">Résultats calculés en temps réel</div>
+    <div id="pnd-results" class="devis-result-card">
+      <div style="text-align:center;color:var(--text3);font-size:13px;padding:10px">Remplissez les paramètres ci-dessus pour voir les résultats</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('pondeuses')">Fermer</button>
+      <button class="btn btn-primary" onclick="printPondeuses()">🖨️ Imprimer le devis complet</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODAL DEVIS CHAIRS ========== -->
+<div class="modal-overlay" id="modal-chairs">
+  <div class="modal modal-xl">
+    <div class="modal-title">🍗 Devis Poulets de Chair</div>
+    <div class="devis-section-title">Informations client</div>
+    <div class="devis-form-grid">
+      <div class="form-group"><label>Nom du client</label><input type="text" class="form-input" id="chr-client" placeholder="ex: M. Kouamé" list="dl-clients"></div>
+      <div class="form-group"><label>Contact</label><input type="tel" class="form-input" id="chr-contact" placeholder="+225 07 00 00 00 00"></div>
+      <div class="form-group"><label>Date</label><input type="date" class="form-input" id="chr-date"></div>
+      <div class="form-group"><label>Lieu</label><input type="text" class="form-input" id="chr-lieu" placeholder="Abidjan"></div>
+    </div>
+    <div class="devis-section-title">Hypothèses de travail</div>
+    <div class="devis-form-grid">
+      <div class="form-group"><label>Effectif initial</label><input type="number" class="form-input" id="chr-effectif" value="1000" min="1" oninput="calcChairs()"></div>
+      <div class="form-group"><label>Prix poussin d'un jour (FCFA)</label><input type="number" class="form-input" id="chr-prix-poussin" value="650" oninput="calcChairs()"></div>
+      <div class="form-group"><label>Mortalité (%)</label><input type="number" class="form-input" id="chr-mort" value="5" min="0" max="100" oninput="calcChairs()"></div>
+      <div class="form-group"><label>Prix de vente net (FCFA)</label><input type="number" class="form-input" id="chr-prix-vente" value="2300" oninput="calcChairs()"></div>
+      <div class="form-group"><label>Bandes par an</label><input type="number" class="form-input" id="chr-bandes" value="7" min="1" oninput="calcChairs()"></div>
+      <div class="form-group"><label>Âge d'abattage (jours)</label><input type="number" class="form-input" id="chr-age" value="35" min="1" oninput="calcChairs()"></div>
+    </div>
+    <div class="devis-section-title">Résultats calculés en temps réel</div>
+    <div id="chr-results" class="devis-result-card">
+      <div style="text-align:center;color:var(--text3);font-size:13px;padding:10px">Remplissez les paramètres ci-dessus pour voir les résultats</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('chairs')">Fermer</button>
+      <button class="btn btn-primary" onclick="printChairs()">🖨️ Imprimer le devis complet</button>
+    </div>
   </div>
 </div>
 
@@ -1692,6 +1855,467 @@ function showFactureProForma(entry, type){
   document.getElementById('fac-sig-name').textContent = pp.nom||'Le Partenaire des Éleveurs';
   document.getElementById('fac-footer-left').textContent = 'Réf : '+(entry.ref||'');
   if(!DB.nextFac) DB.nextFac=1; DB.nextFac++; saveDB();
+}
+
+
+// =============================================
+//  DEVIS & FACTURES
+// =============================================
+var fpRowCount = 0;
+
+function openDevis(type){
+  var t = new Date().toISOString().split('T')[0];
+  if(type==='fp'){
+    document.getElementById('fp-date').value = t;
+    var tbody = document.getElementById('fp-tbody');
+    if(tbody.children.length === 0){ addFPRow(); addFPRow(); addFPRow(); addFPRow(); addFPRow(); }
+    calcFP();
+    document.getElementById('modal-fp').classList.add('open');
+  } else if(type==='pondeuses'){
+    document.getElementById('pnd-date').value = t;
+    calcPondeuses();
+    document.getElementById('modal-pondeuses').classList.add('open');
+  } else if(type==='chairs'){
+    document.getElementById('chr-date').value = t;
+    calcChairs();
+    document.getElementById('modal-chairs').classList.add('open');
+  }
+}
+
+// ---- FACTURE PRO-FORMA ----
+function addFPRow(){
+  fpRowCount++;
+  var id = fpRowCount;
+  var tbody = document.getElementById('fp-tbody');
+  var tr = document.createElement('tr');
+  tr.id = 'fp-row-' + id;
+  tr.innerHTML =
+    '<td><input type="number" placeholder="0" oninput="calcFP()" id="fp-qty-'+id+'" min="0" style="width:100%;border:none;background:transparent;font-size:13px;font-family:DM Sans,sans-serif;padding:2px 4px;outline:none;color:var(--text)"></td>' +
+    '<td><input type="text" placeholder="Désignation..." id="fp-des-'+id+'" style="width:100%;border:none;background:transparent;font-size:13px;font-family:DM Sans,sans-serif;padding:2px 4px;outline:none;color:var(--text)"></td>' +
+    '<td><input type="number" placeholder="0" oninput="calcFP()" id="fp-pu-'+id+'" min="0" style="width:100%;border:none;background:transparent;font-size:13px;font-family:DM Mono,monospace;padding:2px 4px;outline:none;color:var(--text)"></td>' +
+    '<td style="font-family:DM Mono,monospace;text-align:right;font-weight:600;padding:6px 8px;white-space:nowrap" id="fp-mt-'+id+'">0</td>' +
+    '<td style="text-align:center;padding:4px"><button onclick="removeFPRow('+id+')" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:15px;line-height:1">✕</button></td>';
+  tbody.appendChild(tr);
+  calcFP();
+}
+
+function removeFPRow(id){
+  var row = document.getElementById('fp-row-' + id);
+  if(row) row.remove();
+  calcFP();
+}
+
+function calcFP(){
+  var tbody = document.getElementById('fp-tbody');
+  var rows = tbody.querySelectorAll('tr');
+  var total = 0;
+  var count = 0;
+  rows.forEach(function(tr){
+    var id = tr.id.replace('fp-row-','');
+    var qtyEl = document.getElementById('fp-qty-'+id);
+    var puEl  = document.getElementById('fp-pu-'+id);
+    var mtEl  = document.getElementById('fp-mt-'+id);
+    var desEl = document.getElementById('fp-des-'+id);
+    if(!qtyEl) return;
+    var qty = parseFloat(qtyEl.value)||0;
+    var pu  = parseFloat(puEl.value)||0;
+    var mt  = qty * pu;
+    if(mtEl) mtEl.textContent = fmt(mt);
+    total += mt;
+    if(desEl && desEl.value.trim()) count++;
+  });
+  var mdo = parseFloat(document.getElementById('fp-mdo').value)||0;
+  var grand = total + mdo;
+  document.getElementById('fp-achat-total').value = fmt(total) + ' FCFA';
+  document.getElementById('fp-total-display').textContent = fmt(grand) + ' FCFA';
+  document.getElementById('fp-rows-count').textContent = rows.length;
+  return {total:total, mdo:mdo, grand:grand};
+}
+
+function printFP(){
+  var pp = DB.params;
+  var titre   = document.getElementById('fp-titre').value   || 'DEVIS';
+  var client  = document.getElementById('fp-client').value  || '—';
+  var contact = document.getElementById('fp-contact').value || '—';
+  var date    = fmtD(document.getElementById('fp-date').value);
+  var logo    = pp.logo || '';
+  var totals  = calcFP();
+
+  var tbody = document.getElementById('fp-tbody');
+  var rows  = tbody.querySelectorAll('tr');
+  var rowsHTML = '';
+  var idx = 0;
+  rows.forEach(function(tr){
+    var id  = tr.id.replace('fp-row-','');
+    var qty = document.getElementById('fp-qty-'+id) ? document.getElementById('fp-qty-'+id).value : '';
+    var des = document.getElementById('fp-des-'+id) ? document.getElementById('fp-des-'+id).value : '';
+    var pu  = document.getElementById('fp-pu-'+id)  ? document.getElementById('fp-pu-'+id).value  : '';
+    var mt  = document.getElementById('fp-mt-'+id)  ? document.getElementById('fp-mt-'+id).textContent : '0';
+    if(des.trim()){
+      idx++;
+      var bg = idx%2===0 ? '#F5F5F0' : '#FFFFFF';
+      rowsHTML += '<tr style="background:'+bg+'"><td style="padding:6px 10px;border:1px solid #D0D0C8;text-align:center">'+qty+'</td><td style="padding:6px 10px;border:1px solid #D0D0C8">'+des+'</td><td style="padding:6px 10px;border:1px solid #D0D0C8;text-align:right">'+fmt(parseFloat(pu)||0)+'</td><td style="padding:6px 10px;border:1px solid #D0D0C8;text-align:right;font-weight:600">'+mt+'</td></tr>';
+    }
+  });
+
+  var nom   = pp.nom  || 'LE PARTENAIRE DES ÉLEVEURS';
+  var ville = pp.ville|| 'Abidjan, Côte d\'Ivoire';
+  var tel   = pp.tel  || '';
+
+  var w_html = '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>' + titre + '</title>' +
+    '<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:12px;color:#1A1714}' +
+    '.hdr{background:#2D6A4F;color:#fff;padding:14px 22px;display:flex;align-items:center;gap:14px}' +
+    '.hdr img{height:66px;width:auto;object-fit:contain;background:#fff;border-radius:6px;padding:3px}' +
+    '.hdr-logo-placeholder{width:66px;height:66px;background:#D8EDDF;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}' +
+    '.hdr-info{flex:1}.hdr-name{font-size:14px;font-weight:700}.hdr-detail{font-size:10px;opacity:.85;line-height:1.7;margin-top:3px}' +
+    '.hdr-fp{background:#F5C518;color:#1A1714;padding:8px 14px;border-radius:6px;text-align:center;flex-shrink:0}' +
+    '.hdr-fp-label{font-size:13px;font-weight:700}.hdr-fp-date{font-size:10px;margin-top:2px}' +
+    '.body{padding:18px 22px}' +
+    '.devis-title{font-size:16px;font-weight:700;text-align:center;margin:14px 0 6px;color:#1A1714;text-transform:uppercase}' +
+    '.client-line{text-align:center;margin-bottom:14px;font-size:12px;color:#444}' +
+    'table{width:100%;border-collapse:collapse}' +
+    'thead tr{background:#F5C518}thead th{padding:7px 10px;text-align:left;font-size:11px;font-weight:700;color:#1A1714}' +
+    '.tr-total{background:#F0EDE8;font-weight:700}.tr-total td{padding:7px 10px;border:1px solid #C8C8C0}' +
+    '.tr-grand{background:#2D6A4F;color:#fff;font-weight:700;font-size:13px}.tr-grand td{padding:9px 10px}' +
+    '.foot{background:#F0EDE8;padding:10px 22px;font-size:10px;color:#666;text-align:center;border-top:2px solid #2D6A4F;margin-top:20px}' +
+    '@media print{@page{margin:.5cm}body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}' +
+    '</style></head><body>' +
+    '<div class="hdr">' +
+    (logo ? '<img src="'+logo+'" alt="Logo">' : '<div class="hdr-logo-placeholder">🐓</div>') +
+    '<div class="hdr-info"><div class="hdr-name">'+nom+'</div><div class="hdr-detail">' +
+    (pp.owner ? pp.owner+'<br>' : '') + ville +
+    (tel ? '<br>Tél : '+tel : '') + '</div></div>' +
+    '<div class="hdr-fp"><div class="hdr-fp-label">FACTURE PROFORMA</div><div class="hdr-fp-date">Date d\'émission : '+date+'</div></div>' +
+    '</div>' +
+    '<div class="body">' +
+    '<div class="devis-title">'+titre+'</div>' +
+    '<div class="client-line"><strong>Cliente / Client :</strong> '+client+'&nbsp;&nbsp;&nbsp;<strong>Contact :</strong> '+contact+'</div>' +
+    '<table><thead><tr><th style="width:60px">Qtés</th><th>Désignations</th><th style="width:120px;text-align:right">Prix unitaire</th><th style="width:130px;text-align:right">Montant (FCFA)</th></tr></thead>' +
+    '<tbody>'+rowsHTML+'</tbody>' +
+    '<tfoot>' +
+    '<tr class="tr-total"><td colspan="3" style="text-align:right;padding:7px 10px;border:1px solid #C8C8C0">PRIX D\'ACHAT TOTAL</td><td style="padding:7px 10px;border:1px solid #C8C8C0;text-align:right">'+fmt(totals.total)+'</td></tr>' +
+    '<tr class="tr-total"><td colspan="3" style="text-align:right;padding:7px 10px;border:1px solid #C8C8C0">MAIN D\'OEUVRE</td><td style="padding:7px 10px;border:1px solid #C8C8C0;text-align:right">'+(totals.mdo>0?fmt(totals.mdo):'—')+'</td></tr>' +
+    '<tr class="tr-grand"><td colspan="3" style="text-align:right;padding:9px 10px">TOTAL</td><td style="text-align:right;font-size:14px;padding:9px 10px">'+fmt(totals.grand)+'</td></tr>' +
+    '</tfoot></table>' +
+    '</div>' +
+    '<div class="foot">'+nom+(ville?' — '+ville:'')+(tel?' — Tél : '+tel:'')+'</div>' +
+    '<scri'+'pt>window.onload=function(){window.print();window.onafterprint=function(){window.close();};}<'+'/scri'+'pt>' +
+    '</body></html>';
+
+  var w = window.open('','_blank','width=820,height=920');
+  w.document.write(w_html);
+  w.document.close();
+}
+
+// ---- DEVIS PONDEUSES ----
+function calcPondeuses(){
+  var eff   = parseFloat(document.getElementById('pnd-effectif').value)     || 10000;
+  var ppx   = parseFloat(document.getElementById('pnd-prix-poussin').value)  || 1150;
+  var m1    = (parseFloat(document.getElementById('pnd-mort1').value)  || 5) / 100;
+  var m2    = (parseFloat(document.getElementById('pnd-mort2').value)  || 5) / 100;
+  var noeufs= parseFloat(document.getElementById('pnd-oeufs').value)         || 295;
+  var poeuf = parseFloat(document.getElementById('pnd-prix-oeuf').value)     || 80;
+  var prefm = parseFloat(document.getElementById('pnd-prix-reforme').value)  || 4000;
+  var dens  = parseFloat(document.getElementById('pnd-densite').value)       || 5;
+
+  var poulesEntree = Math.round(eff * (1 - m1));
+  var poulesRefm   = Math.round(poulesEntree * (1 - m2));
+  var surf         = Math.ceil(eff / dens);
+
+  var invBat   = surf * 18000;
+  var abr1     = Math.ceil(eff/50)  * 2000;
+  var abrAuto  = Math.ceil(eff/50)  * 12000;
+  var pondrs   = Math.ceil(eff/200) * 100000;
+  var mang1    = Math.ceil(eff/50)  * 1500;
+  var mang2    = Math.ceil(eff/25)  * 2000;
+  var elevz    = Math.ceil(eff/1000)* 55000;
+  var totalInvest = invBat + abr1 + abrAuto + pondrs + mang1 + mang2 + elevz;
+
+  var cPoussin = eff * ppx;
+  var cAlimDem = eff * 0.875 * 371;
+  var cAlimCro = eff * 2.75  * 306;
+  var cAlimElv = eff * 3.875 * 284;
+  var cVeto1   = eff * 300;
+  var cChauf   = eff * 50;
+  var totalFonc= cPoussin + cAlimDem + cAlimCro + cAlimElv + cVeto1 + cChauf;
+
+  var cPonte1  = poulesEntree * 11.5 * 306;
+  var cPonte2  = poulesRefm   * 31.5 * 306;
+  var cVeto2   = poulesRefm * 12 * 45;
+  var cMDO     = 5 * 75000 * 12;
+  var totalOeufs = noeufs * ((poulesEntree + poulesRefm) / 2);
+  var nAlveo   = Math.ceil(totalOeufs / 30);
+  var cAlveo   = nAlveo * 55;
+  var totalExploit = cPonte1 + cPonte2 + cVeto2 + cMDO + cAlveo;
+  var totalCharge  = totalFonc + totalExploit;
+
+  var recOeufs = Math.round(totalOeufs) * poeuf;
+  var recRefm  = poulesRefm * prefm;
+  var recTotale= recOeufs + recRefm;
+  var benefice = recTotale - totalCharge;
+
+  var kpis = '<div class="devis-kpi-grid">';
+  kpis += '<div class="devis-kpi" style="background:var(--accent-light)"><div class="devis-kpi-label" style="color:var(--accent)">Poules à l\'entrée en ponte</div><div class="devis-kpi-val" style="color:var(--accent)">'+fmt(poulesEntree)+'</div></div>';
+  kpis += '<div class="devis-kpi" style="background:var(--accent-light)"><div class="devis-kpi-label" style="color:var(--accent)">Poules à la réforme</div><div class="devis-kpi-val" style="color:var(--accent)">'+fmt(poulesRefm)+'</div></div>';
+  kpis += '<div class="devis-kpi" style="background:var(--blue-light)"><div class="devis-kpi-label" style="color:var(--blue)">Total œufs produits</div><div class="devis-kpi-val" style="color:var(--blue)">'+fmt(Math.round(totalOeufs))+'</div></div>';
+  kpis += '<div class="devis-kpi" style="background:var(--gold-light)"><div class="devis-kpi-label" style="color:var(--gold)">Surface bâtiment</div><div class="devis-kpi-val" style="color:var(--gold)">'+surf+' m²</div></div>';
+  kpis += '</div>';
+
+  var rows = '';
+  rows += '<div class="devis-result-row"><span>Investissement total (amortissable 5 ans)</span><span class="mono">'+fmt(Math.round(totalInvest))+' FCFA</span></div>';
+  rows += '<div class="devis-result-row"><span>Charges de fonctionnement (0–20 sem.)</span><span class="mono">'+fmt(Math.round(totalFonc))+' FCFA</span></div>';
+  rows += '<div class="devis-result-row"><span>Charges d\'exploitation (20 sem.+)</span><span class="mono">'+fmt(Math.round(totalExploit))+' FCFA</span></div>';
+  rows += '<div class="devis-result-row total"><span>TOTAL CHARGES</span><span class="mono">'+fmt(Math.round(totalCharge))+' FCFA</span></div>';
+  rows += '<div class="devis-result-row" style="margin-top:8px"><span>Recette vente œufs ('+fmt(Math.round(totalOeufs))+' × '+poeuf+' FCFA)</span><span class="mono">'+fmt(recOeufs)+' FCFA</span></div>';
+  rows += '<div class="devis-result-row"><span>Recette vente réforme ('+fmt(poulesRefm)+' × '+fmt(prefm)+' FCFA)</span><span class="mono">'+fmt(recRefm)+' FCFA</span></div>';
+  rows += '<div class="devis-result-row total"><span>RECETTE TOTALE</span><span class="mono">'+fmt(recTotale)+' FCFA</span></div>';
+  var bcls = benefice >= 0 ? 'benef-pos' : 'benef-neg';
+  rows += '<div class="devis-result-row '+bcls+'"><span>BÉNÉFICE NET 🎯</span><span class="mono">'+fmt(Math.round(benefice))+' FCFA</span></div>';
+
+  document.getElementById('pnd-results').innerHTML = kpis + rows;
+  return {eff,ppx,m1,m2,noeufs,poeuf,prefm,dens,poulesEntree,poulesRefm,surf,totalInvest,invBat,abr1,abrAuto,pondrs,mang1,mang2,elevz,cPoussin,cAlimDem,cAlimCro,cAlimElv,cVeto1,cChauf,totalFonc,cPonte1,cPonte2,cVeto2,cMDO,nAlveo,cAlveo,totalExploit,totalCharge,totalOeufs,recOeufs,recRefm,recTotale,benefice};
+}
+
+function printPondeuses(){
+  var d = calcPondeuses();
+  var pp = DB.params;
+  var logo    = pp.logo  || '';
+  var nom     = pp.nom   || 'Le Partenaire des Éleveurs';
+  var ville   = pp.ville || 'Abidjan';
+  var tel     = pp.tel   || '';
+  var client  = document.getElementById('pnd-client').value  || '—';
+  var contact = document.getElementById('pnd-contact').value || '';
+  var date    = fmtD(document.getElementById('pnd-date').value);
+  var lieu    = document.getElementById('pnd-lieu').value || 'Abidjan';
+
+  function td(v,right,bold,bg){
+    var s='padding:5px 8px;border:1px solid #D0D0C8;'+(right?'text-align:right;':'')+(bold?'font-weight:700;':'')+(bg?'background:'+bg+';':'');
+    return '<td style="'+s+'">'+v+'</td>';
+  }
+  function hdr(cols){return '<tr style="background:#2D6A4F;color:#fff">'+cols.map(function(c){return'<th style="padding:6px 8px;font-size:11px">'+c+'</th>';}).join('')+'</tr>';}
+  function r(cols,bg){return'<tr'+(bg?' style="background:'+bg+'"':'')+'>'+cols.map(function(c,i){return td(c,i>0,false,'');}).join('')+'</tr>';}
+  function rtot(cols){return'<tr style="background:#2D6A4F;color:#fff">'+cols.map(function(c,i){return'<td style="padding:6px 8px;'+(i>0?'text-align:right;':'')+'font-weight:700">'+c+'</td>';}).join('')+'</tr>';}
+
+  var W = '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Devis Pondeuses</title>' +
+  '<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:11.5px;color:#1A1714;padding:8mm}' +
+  'h1{font-size:20px;font-weight:700;color:#2D6A4F;text-align:center;margin:0 0 4px}' +
+  'h2{font-size:12px;font-weight:700;color:#2D6A4F;margin:12px 0 5px;border-bottom:2px solid #D8EDDF;padding-bottom:3px;text-transform:uppercase}' +
+  '.hdr{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:10px 14px;background:#F0EDE8;border-radius:6px}' +
+  '.hdr img{height:56px;width:auto;object-fit:contain}' +
+  'table{width:100%;border-collapse:collapse;margin-bottom:10px}' +
+  '.benef-box{text-align:center;padding:12px;border-radius:6px;font-size:16px;font-weight:700;margin:10px 0;border:2px solid '+(d.benefice>=0?'#2D6A4F':'#C0392B')+';color:'+(d.benefice>=0?'#2D6A4F':'#C0392B')+';background:'+(d.benefice>=0?'#D8EDDF':'#FDECEA')+'}' +
+  '.concl{background:#F0EDE8;padding:10px 12px;font-size:10px;color:#555;border-radius:4px;margin-top:10px}' +
+  '.foot{text-align:center;font-size:10px;color:#888;margin-top:12px;border-top:1px solid #ddd;padding-top:8px}' +
+  '@media print{@page{margin:.7cm}body{-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:5mm}}' +
+  '</style></head><body>' +
+  '<div class="hdr">'+(logo?'<img src="'+logo+'" alt="">':'<span style="font-size:28px">🥚</span>')+'<div><div style="font-size:14px;font-weight:700;color:#2D6A4F">'+nom+'</div><div style="font-size:10px;color:#666">'+ville+(tel?' — '+tel:'')+'</div></div></div>' +
+  '<h1>DEVIS POUR '+fmt(d.eff)+' POULES PONDEUSES</h1>' +
+  '<p style="text-align:center;margin:0 0 14px;font-size:11px;color:#555">Fait par '+nom+' — Le '+date+' à '+lieu+' — <strong>'+client+'</strong>'+(contact?' — '+contact:'')+'</p>' +
+
+  '<h2>1. Hypothèse de travail</h2>' +
+  '<table>'+hdr(['Article','Valeur'])+ r(['Achat poussins',fmt(d.eff)],'#F9F9F9')+ r(['Mise en place',fmt(d.eff)])+ r(['Mortalité phase 1 (1–21 sem)',(d.m1*100).toFixed(0)+'%'],'#F9F9F9')+ r(['Mortalité phase 2 (21–76 sem)',(d.m2*100).toFixed(0)+'%'])+ r(['Nombre d\'œufs / poule départ',d.noeufs],'#F9F9F9')+ r(['Prix moyen de l\'œuf',fmt(d.poeuf)+' FCFA'])+ r(['Densité (poussins/m²)',d.dens],'#F9F9F9')+ r(['Poules à l\'entrée en ponte',fmt(d.poulesEntree),'#D8EDDF'])+ r(['Poules à la réforme',fmt(d.poulesRefm)],'#D8EDDF')+ r(['Prix de vente à la réforme',fmt(d.prefm)+' FCFA'],'#F9F9F9')+'</table>'+
+
+  '<h2>2. Investissement à amortir sur 5 ans</h2>' +
+  '<table>'+hdr(['N°','Matériels','Quantité','Coût unitaire','Montant FCFA'])+
+  '<tr><td style="padding:5px 8px;border:1px solid #D0D0C8">1</td><td style="padding:5px 8px;border:1px solid #D0D0C8">Bâtiment</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right">'+d.surf+' m²</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right">18 000</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right;font-weight:700">'+fmt(d.invBat)+'</td></tr>'+
+  '<tr style="background:#F9F9F9"><td style="padding:5px 8px;border:1px solid #D0D0C8">2</td><td style="padding:5px 8px;border:1px solid #D0D0C8">Abreuvoirs 1er âge</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right">'+Math.ceil(d.eff/50)+'</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right">2 000</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right;font-weight:700">'+fmt(d.abr1)+'</td></tr>'+
+  '<tr><td style="padding:5px 8px;border:1px solid #D0D0C8">3</td><td style="padding:5px 8px;border:1px solid #D0D0C8">Abreuvoirs automatiques</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right">'+Math.ceil(d.eff/50)+'</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right">12 000</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right;font-weight:700">'+fmt(d.abrAuto)+'</td></tr>'+
+  '<tr style="background:#F9F9F9"><td style="padding:5px 8px;border:1px solid #D0D0C8">4</td><td style="padding:5px 8px;border:1px solid #D0D0C8">Pondoirs</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right">'+Math.ceil(d.eff/200)+'</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right">100 000</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right;font-weight:700">'+fmt(d.pondrs)+'</td></tr>'+
+  '<tr><td style="padding:5px 8px;border:1px solid #D0D0C8">5</td><td style="padding:5px 8px;border:1px solid #D0D0C8">Mangeoires 1er âge</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right">'+Math.ceil(d.eff/50)+'</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right">1 500</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right;font-weight:700">'+fmt(d.mang1)+'</td></tr>'+
+  '<tr style="background:#F9F9F9"><td style="padding:5px 8px;border:1px solid #D0D0C8">6</td><td style="padding:5px 8px;border:1px solid #D0D0C8">Mangeoires 2e âge</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right">'+Math.ceil(d.eff/25)+'</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right">2 000</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right;font-weight:700">'+fmt(d.mang2)+'</td></tr>'+
+  '<tr><td style="padding:5px 8px;border:1px solid #D0D0C8">7</td><td style="padding:5px 8px;border:1px solid #D0D0C8">Éleveuse à gaz</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right">'+Math.ceil(d.eff/1000)+'</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right">55 000</td><td style="padding:5px 8px;border:1px solid #D0D0C8;text-align:right;font-weight:700">'+fmt(d.elevz)+'</td></tr>'+
+  rtot(['TOTAL INVESTISSEMENT','','','',fmt(Math.round(d.totalInvest))+' FCFA'])+'</table>'+
+
+  '<h2>3. Charges de fonctionnement (0–20 semaines)</h2>'+
+  '<table>'+hdr(['N°','Produits','Nombre','Conso/poule','Coût unitaire','Montant FCFA'])+
+  r(['1','Poulette d\'un jour',fmt(d.eff),'1',fmt(d.ppx),fmt(Math.round(d.cPoussin))])+
+  r(['2','Aliment démarrage (1–5 sem)',fmt(d.eff),'0,875 kg','371',fmt(Math.round(d.cAlimDem))],'#F9F9F9')+
+  r(['3','Aliment croissance (5–12 sem)',fmt(d.eff),'2,75 kg','306',fmt(Math.round(d.cAlimCro))])+
+  r(['4','Aliment élevage (12–20 sem)',fmt(d.eff),'3,875 kg','284',fmt(Math.round(d.cAlimElv))],'#F9F9F9')+
+  r(['5','Produits vétérinaires',fmt(d.eff),'1','300',fmt(Math.round(d.cVeto1))])+
+  r(['6','Chauffage + copeau',fmt(d.eff),'—','50',fmt(Math.round(d.cChauf))],'#F9F9F9')+
+  rtot(['TOTAL FONCTIONNEMENT','','','','',fmt(Math.round(d.totalFonc))+' FCFA'])+'</table>'+
+
+  '<h2>4. Charges d\'exploitation (à partir de 20 semaines)</h2>'+
+  '<table>'+hdr(['N°','Produits','Nombre','Conso/poule','Coût unitaire','Montant FCFA'])+
+  r(['1','Aliment ponte 1',fmt(d.poulesEntree),'11,5 kg','306',fmt(Math.round(d.cPonte1))])+
+  r(['2','Aliment ponte 2 (+36 sem)',fmt(d.poulesRefm),'31,5 kg','306',fmt(Math.round(d.cPonte2))],'#F9F9F9')+
+  r(['3','Produits vétérinaires',fmt(d.poulesRefm),'12','45',fmt(Math.round(d.cVeto2))])+
+  r(['4','Main d\'œuvre (12 mois)','5','75 000','×12',fmt(d.cMDO)],'#F9F9F9')+
+  r(['5','Alvéoles',fmt(d.nAlveo),'—','55',fmt(Math.round(d.cAlveo))])+
+  rtot(['TOTAL EXPLOITATION','','','','',fmt(Math.round(d.totalExploit))+' FCFA'])+
+  '<tr style="background:#1e4d39;color:#fff"><td colspan="5" style="padding:6px 8px;font-weight:700">CHARGE TOTALE (Fonctionnement + Exploitation)</td><td style="padding:6px 8px;text-align:right;font-weight:700">'+fmt(Math.round(d.totalCharge))+' FCFA</td></tr>'+
+  '</table>'+
+
+  '<h2>5. La recette d\'exploitation</h2>'+
+  '<table>'+hdr(['N°','Produits','Nombre','Prix de vente','Montant FCFA'])+
+  r(['1','Vente poulets à la réforme',fmt(d.poulesRefm),fmt(d.prefm)+' FCFA',fmt(d.recRefm)])+
+  r(['2','Vente des œufs',fmt(Math.round(d.totalOeufs)),fmt(d.poeuf)+' FCFA',fmt(d.recOeufs)],'#F9F9F9')+
+  rtot(['RECETTE TOTALE','','','',fmt(d.recTotale)+' FCFA'])+
+  '</table>'+
+
+  '<h2>6. Bénéfice net de la bande</h2>'+
+  '<p style="margin-bottom:6px;font-size:11px">Bénéfice = Recette Totale – Charges Totales = '+fmt(d.recTotale)+' – '+fmt(Math.round(d.totalCharge))+'</p>'+
+  '<div class="benef-box">BÉNÉFICE NET : '+fmt(Math.round(d.benefice))+' FCFA</div>'+
+  '<div class="concl"><strong>CONCLUSION :</strong> Une bonne planification et une gestion rigoureuse permettent de transformer un élevage de volaille en une activité rentable. Ce devis peut être revu en fonction des défis sur le terrain. L\'investissement de départ est à amortir sur 5 ans.</div>'+
+  '<div class="foot">Devis établi par '+nom+(tel?' — '+tel:'')+' — '+date+'</div>'+
+  '<scri'+'pt>window.onload=function(){window.print();window.onafterprint=function(){window.close();};}<'+'/scri'+'pt>'+
+  '</body></html>';
+
+  var w = window.open('','_blank','width=920,height=1040');
+  w.document.write(W);
+  w.document.close();
+}
+
+// ---- DEVIS POULETS DE CHAIR ----
+function calcChairs(){
+  var eff   = parseFloat(document.getElementById('chr-effectif').value)     || 1000;
+  var ppx   = parseFloat(document.getElementById('chr-prix-poussin').value)  || 650;
+  var mort  = (parseFloat(document.getElementById('chr-mort').value) || 5) / 100;
+  var pvte  = parseFloat(document.getElementById('chr-prix-vente').value)   || 2300;
+  var bandes= parseFloat(document.getElementById('chr-bandes').value)       || 7;
+  var age   = parseFloat(document.getElementById('chr-age').value)          || 35;
+
+  var nVente  = Math.round(eff * (1 - mort));
+  var surf    = Math.ceil(eff / 10);
+
+  var invBat  = surf * 18000;
+  var abr1    = Math.ceil(eff/50) * 2000;
+  var abr2    = Math.ceil(eff/25) * 5000;
+  var mang1   = Math.ceil(eff/50) * 1500;
+  var mang2   = Math.ceil(eff/25) * 2000;
+  var elevz   = Math.max(1, Math.ceil(eff/1000)) * 55000;
+  var totalInvest = invBat + abr1 + abr2 + mang1 + mang2 + elevz;
+
+  var cPoussin = eff * ppx;
+  var cAlimDem = eff * 1   * 415;
+  var cAlimCro = eff * 2   * 393;
+  var cVeto    = eff * 1   * 100;
+  var cChauf   = eff * 11;
+  var cMDO     = 75000;
+  var cCopeau  = eff * 20;
+  var totalFonc = cPoussin + cAlimDem + cAlimCro + cVeto + cChauf + cMDO + cCopeau;
+
+  var recBande   = nVente * pvte;
+  var benBande   = recBande - totalFonc;
+  var recAnnuel  = recBande * bandes;
+  var chgAnnuel  = totalFonc * bandes;
+  var benAnnuel  = benBande * bandes;
+
+  var kpis = '<div class="devis-kpi-grid">';
+  kpis += '<div class="devis-kpi" style="background:var(--accent-light)"><div class="devis-kpi-label" style="color:var(--accent)">Poulets à la vente / bande</div><div class="devis-kpi-val" style="color:var(--accent)">'+fmt(nVente)+'</div></div>';
+  kpis += '<div class="devis-kpi" style="background:var(--blue-light)"><div class="devis-kpi-label" style="color:var(--blue)">Surface bâtiment</div><div class="devis-kpi-val" style="color:var(--blue)">'+surf+' m²</div></div>';
+  kpis += '<div class="devis-kpi" style="background:var(--gold-light)"><div class="devis-kpi-label" style="color:var(--gold)">Investissement total</div><div class="devis-kpi-val" style="color:var(--gold)">'+fmt(totalInvest)+'</div></div>';
+  kpis += '<div class="devis-kpi" style="background:var(--surface2)"><div class="devis-kpi-label" style="color:var(--text2)">Âge d\'abattage</div><div class="devis-kpi-val" style="color:var(--text)">'+age+' jours</div></div>';
+  kpis += '</div>';
+
+  var rows = '<div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase">Par bande</div>';
+  rows += '<div class="devis-result-row"><span>Charges de fonctionnement</span><span class="mono">'+fmt(Math.round(totalFonc))+' FCFA</span></div>';
+  rows += '<div class="devis-result-row"><span>Recette ('+fmt(nVente)+' × '+fmt(pvte)+' FCFA)</span><span class="mono">'+fmt(recBande)+' FCFA</span></div>';
+  var bcls = benBande>=0 ? 'total benef-pos' : 'total benef-neg';
+  rows += '<div class="devis-result-row '+bcls+'"><span>Bénéfice net / bande</span><span class="mono">'+fmt(Math.round(benBande))+' FCFA</span></div>';
+  rows += '<div style="font-size:11px;font-weight:600;color:var(--text2);margin:12px 0 6px;text-transform:uppercase">Projection annuelle ('+bandes+' bandes)</div>';
+  rows += '<div class="devis-result-row"><span>Recette annuelle</span><span class="mono">'+fmt(recAnnuel)+' FCFA</span></div>';
+  rows += '<div class="devis-result-row"><span>Charges annuelles</span><span class="mono">'+fmt(Math.round(chgAnnuel))+' FCFA</span></div>';
+  var bcls2 = benAnnuel>=0 ? 'benef-pos' : 'benef-neg';
+  rows += '<div class="devis-result-row '+bcls2+'" style="margin-top:8px;padding-top:8px;border-top:2px solid var(--border)"><span>BÉNÉFICE ANNUEL 🎯</span><span class="mono">'+fmt(Math.round(benAnnuel))+' FCFA</span></div>';
+
+  document.getElementById('chr-results').innerHTML = kpis + rows;
+  return {eff,ppx,mort,pvte,bandes,age,nVente,surf,totalInvest,invBat,abr1,abr2,mang1,mang2,elevz,cPoussin,cAlimDem,cAlimCro,cVeto,cChauf,cMDO,cCopeau,totalFonc,recBande,benBande,recAnnuel,chgAnnuel,benAnnuel};
+}
+
+function printChairs(){
+  var d = calcChairs();
+  var pp      = DB.params;
+  var logo    = pp.logo  || '';
+  var nom     = pp.nom   || 'Le Partenaire des Éleveurs';
+  var ville   = pp.ville || 'Abidjan';
+  var tel     = pp.tel   || '';
+  var client  = document.getElementById('chr-client').value  || '—';
+  var contact = document.getElementById('chr-contact').value || '';
+  var date    = fmtD(document.getElementById('chr-date').value);
+  var lieu    = document.getElementById('chr-lieu').value || 'Abidjan';
+
+  function td(v,right,bold){return'<td style="padding:5px 8px;border:1px solid #D0D0C8;'+(right?'text-align:right;':'')+(bold?'font-weight:700;':'')+'">'+v+'</td>';}
+  function hdr(cols){return'<tr style="background:#2D6A4F;color:#fff">'+cols.map(function(c){return'<th style="padding:6px 8px;font-size:11px">'+c+'</th>';}).join('')+'</tr>';}
+  function r(cols,bg){return'<tr'+(bg?' style="background:'+bg+'"':'')+'>'+cols.map(function(c,i){return td(c,i>0,false);}).join('')+'</tr>';}
+  function rtot(cols){return'<tr style="background:#2D6A4F;color:#fff">'+cols.map(function(c,i){return'<td style="padding:6px 8px;'+(i>0?'text-align:right;':'')+'font-weight:700">'+c+'</td>';}).join('')+'</tr>';}
+
+  var bColor = d.benAnnuel>=0?'#2D6A4F':'#C0392B';
+  var bBg    = d.benAnnuel>=0?'#D8EDDF':'#FDECEA';
+
+  var W = '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Devis Chairs</title>'+
+  '<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:11.5px;color:#1A1714;padding:8mm}'+
+  'h1{font-size:20px;font-weight:700;color:#2D6A4F;text-align:center;margin:0 0 4px}'+
+  'h2{font-size:12px;font-weight:700;color:#2D6A4F;margin:12px 0 5px;border-bottom:2px solid #D8EDDF;padding-bottom:3px;text-transform:uppercase}'+
+  '.hdr{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:10px 14px;background:#F0EDE8;border-radius:6px}'+
+  '.hdr img{height:56px;width:auto;object-fit:contain}'+
+  'table{width:100%;border-collapse:collapse;margin-bottom:10px}'+
+  '.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:10px}'+
+  '.benef-box{text-align:center;padding:10px;border-radius:6px;font-size:15px;font-weight:700;margin:8px 0;border:2px solid '+bColor+';color:'+bColor+';background:'+bBg+'}'+
+  '.proj-box{background:#F0EDE8;border-radius:6px;padding:10px 12px}'+
+  '.proj-row{display:flex;justify-content:space-between;padding:3px 0;font-size:12px;border-bottom:1px solid #ddd}'+
+  '.proj-row:last-child{border-bottom:none}'+
+  '.concl{background:#F0EDE8;padding:10px 12px;font-size:10px;color:#555;border-radius:4px;margin-top:10px}'+
+  '.foot{text-align:center;font-size:10px;color:#888;margin-top:12px;border-top:1px solid #ddd;padding-top:8px}'+
+  '@media print{@page{margin:.7cm}body{-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:5mm}}'+
+  '</style></head><body>'+
+  '<div class="hdr">'+(logo?'<img src="'+logo+'" alt="">':'<span style="font-size:28px">🍗</span>')+'<div><div style="font-size:14px;font-weight:700;color:#2D6A4F">'+nom+'</div><div style="font-size:10px;color:#666">'+ville+(tel?' — '+tel:'')+'</div></div></div>'+
+  '<h1>DEVIS ESTIMATIF POUR '+fmt(d.eff)+' POULETS DE CHAIR</h1>'+
+  '<p style="text-align:center;margin:0 0 14px;font-size:11px;color:#555">Fait par '+nom+' — Le '+date+' à '+lieu+' — <strong>'+client+'</strong>'+(contact?' — '+contact:'')+'</p>'+
+
+  '<div class="two-col">'+
+  '<div><h2>Hypothèse de travail</h2>'+
+  '<table>'+hdr(['Paramètre','Valeur'])+
+  r(['Achat poussins',fmt(d.eff)],'#F9F9F9')+r(['Mise en place',fmt(d.eff)])+r(['Mortalité',(d.mort*100).toFixed(0)+'%'],'#F9F9F9')+
+  r(['Prix de vente net',fmt(d.pvte)+' FCFA'])+r(['Bandes / an',d.bandes],'#F9F9F9')+r(['Âge d\'abattage',d.age+' jours'])+
+  r(['Poulets à la vente',fmt(d.nVente)],'#D8EDDF')+'</table></div>'+
+
+  '<div><h2>Investissement (5 ans)</h2>'+
+  '<table>'+hdr(['Matériel','Qté','Montant FCFA'])+
+  r(['Bâtiment ('+d.surf+' m²)',d.surf,fmt(d.invBat)],'#F9F9F9')+r(['Abreuvoirs 1er âge',Math.ceil(d.eff/50),fmt(d.abr1)])+
+  r(['Abreuvoirs 2e âge',Math.ceil(d.eff/25),fmt(d.abr2)],'#F9F9F9')+r(['Mangeoires 1er âge',Math.ceil(d.eff/50),fmt(d.mang1)])+
+  r(['Mangeoires 2e âge',Math.ceil(d.eff/25),fmt(d.mang2)],'#F9F9F9')+r(['Éleveuse à gaz',Math.max(1,Math.ceil(d.eff/1000)),fmt(d.elevz)])+
+  rtot(['TOTAL','',''+fmt(d.totalInvest)+' F CFA'])+'</table></div>'+
+  '</div>'+
+
+  '<h2>Charges de fonctionnement (par bande)</h2>'+
+  '<table>'+hdr(['Produit','Nombre','Par poussin','Coût unitaire','Montant FCFA'])+
+  r(['Poussin d\'un jour',fmt(d.eff),'—',fmt(d.ppx),fmt(Math.round(d.cPoussin))])+
+  r(['Aliment démarrage (Jr 1–21)',fmt(d.eff),'1 kg','415',fmt(Math.round(d.cAlimDem))],'#F9F9F9')+
+  r(['Aliment croissance (Jr 21–'+d.age+')',fmt(d.eff),'2 kg','393',fmt(Math.round(d.cAlimCro))])+
+  r(['Produits vétérinaires',fmt(d.eff),'1','100',fmt(Math.round(d.cVeto))],'#F9F9F9')+
+  r(['Chauffage',fmt(d.eff),'2 B.','5 500',fmt(Math.round(d.cChauf))])+
+  r(['Main d\'œuvre (1 mois)','1','—','75 000',fmt(d.cMDO)],'#F9F9F9')+
+  r(['Copeau',fmt(d.eff),'—','20',fmt(Math.round(d.cCopeau))])+
+  rtot(['TOTAL FONCTIONNEMENT','','','',fmt(Math.round(d.totalFonc))+' FCFA'])+
+  '</table>'+
+
+  '<div class="two-col">'+
+  '<div><h2>Charge d\'exploitation (recette)</h2>'+
+  '<table>'+hdr(['','Nombre','Coût unit.','Montant'])+
+  r(['Vente de poulets',fmt(d.nVente),fmt(d.pvte),fmt(d.recBande)])+
+  rtot(['RECETTE / BANDE','','',fmt(d.recBande)+' FCFA'])+
+  '</table>'+
+  '<div style="background:#F0EDE8;padding:8px 10px;border-radius:4px;font-size:11px;margin-top:6px">'+
+  'Bénéfice / bande = '+fmt(d.recBande)+' – '+fmt(Math.round(d.totalFonc))+' = <strong style="color:'+(d.benBande>=0?'#2D6A4F':'#C0392B')+'">'+fmt(Math.round(d.benBande))+' FCFA</strong></div></div>'+
+
+  '<div><h2>Projection annuelle ('+d.bandes+' bandes)</h2>'+
+  '<div class="proj-box">'+
+  '<div class="proj-row"><span>Recette annuelle</span><strong>'+fmt(d.recAnnuel)+' FCFA</strong></div>'+
+  '<div class="proj-row"><span>Charges annuelles</span><strong>'+fmt(Math.round(d.chgAnnuel))+' FCFA</strong></div>'+
+  '</div>'+
+  '<div class="benef-box">BÉNÉFICE ANNUEL<br>'+fmt(Math.round(d.benAnnuel))+' FCFA</div></div>'+
+  '</div>'+
+
+  '<div class="concl"><strong>NB :</strong> Pour un début, abreuvoirs automatiques non obligatoires. Prix du m² du bâtiment peut varier. Ce devis peut être revu selon les conditions du terrain.</div>'+
+  '<div class="foot">Devis établi par '+nom+(tel?' — '+tel:'')+' — '+date+'</div>'+
+  '<scri'+'pt>window.onload=function(){window.print();window.onafterprint=function(){window.close();};}<'+'/scri'+'pt>'+
+  '</body></html>';
+
+  var w = window.open('','_blank','width=920,height=1040');
+  w.document.write(W);
+  w.document.close();
 }
 
 // =============================================
