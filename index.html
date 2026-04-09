@@ -1196,17 +1196,6 @@ function init(){
   renderAll();
   updateDataInfo();
   updateLastExportInfo();
-  // Délai pour une expérience fluide
-  setTimeout(function(){
-    if(DB.meta.firstRun){ checkOnboarding(); }
-    else {
-      checkBackupReminder();
-      showBackupBanner();
-      if(found && (DB.commandes.length+DB.materiels.length)>0){
-        toast('✅ '+( DB.commandes.length+DB.materiels.length)+' enregistrement(s) chargé(s)');
-      }
-    }
-  }, 800);
 }
 
 function renderAll(){
@@ -1823,6 +1812,16 @@ function checkLogin(){
     sessionStorage.setItem('gp_session','ok');
     document.getElementById('login-screen').style.display = 'none';
     toast('✅ Bienvenue !');
+    setTimeout(function(){
+      if(DB.meta.firstRun){ checkOnboarding(); }
+      else {
+        checkBackupReminder();
+        showBackupBanner();
+        if(DB.commandes.length+DB.materiels.length>0){
+          toast('✅ '+(DB.commandes.length+DB.materiels.length)+' enregistrement(s) chargé(s)');
+        }
+      }
+    }, 600);
   } else {
     var err = document.getElementById('login-error');
     err.style.display = 'block';
@@ -2392,6 +2391,7 @@ function printChairs(){
 // =============================================
 //  LANCEMENT
 // =============================================
+window.addEventListener('DOMContentLoaded', init);
 
 </script>
 <script>
