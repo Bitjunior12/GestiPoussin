@@ -432,6 +432,15 @@ select{
   .tab-btn{padding:5px 7px;font-size:10px;}
   .stock-summary{grid-template-columns:1fr 1fr;}
 }
+
+/* ====== HISTORIQUE DEVIS ====== */
+.devis-hist-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;transition:box-shadow .2s;}
+.devis-hist-item:hover{box-shadow:var(--sh);}
+.devis-hist-icon{font-size:26px;flex-shrink:0;}
+.devis-hist-info{flex:1;min-width:0;}
+.devis-hist-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.devis-hist-meta{font-size:11px;color:var(--text3);margin-top:2px;}
+.devis-hist-actions{display:flex;gap:6px;flex-shrink:0;}
 </style>
 </style>
 </head>
@@ -746,7 +755,7 @@ select{
   <div class="devis-type-grid">
     <div class="devis-type-card" onclick="openDevis('fp')">
       <div class="devis-type-card-icon"><img class="asset-logo" src="" style="height:52px;width:auto;object-fit:contain;display:block;margin:0 auto 4px" alt="Logo"></div>
-      <div class="devis-type-card-title">Facture Pro-Forma Spéciale</div>
+      <div class="devis-type-card-title">Facture Pro-Forma Bâtiment</div>
       <div class="devis-type-card-desc">Devis libre avec tableau de désignations. Style Le Partenaire des Éleveurs avec votre logo.</div>
       <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center">Créer une facture</button>
     </div>
@@ -762,6 +771,15 @@ select{
       <div class="devis-type-card-desc">Devis estimatif par bande avec projection annuelle sur N bandes.</div>
       <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center">Générer un devis</button>
     </div>
+  </div>
+
+  <!-- Historique des devis sauvegardés -->
+  <div style="margin-top:24px">
+    <div class="section-head" style="margin-bottom:12px">
+      <h2>📁 Historique des devis</h2>
+    </div>
+    <div id="no-devis" style="display:none;text-align:center;padding:24px 0;color:var(--text3);font-size:13px">Aucun devis enregistré. Créez un devis et cliquez sur "Enregistrer & PDF".</div>
+    <div id="devis-history-list"></div>
   </div>
 </div>
 
@@ -938,7 +956,8 @@ select{
     <!-- Actions -->
     <div style="padding:12px 22px;display:flex;gap:8px;justify-content:flex-end;background:#F0EDE8;border-top:1px solid #E2DDD6">
       <button class="btn" onclick="closeModal('receipt')">Fermer</button>
-      <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimer / PDF</button>
+      <button class="btn btn-save" onclick="downloadReceiptPDF()">📥 Télécharger PDF</button>
+      <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimer</button>
     </div>
   </div>
 </div>
@@ -1047,7 +1066,8 @@ select{
     </div>
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('fp')">Fermer</button>
-      <button class="btn btn-primary" onclick="printFP()">🖨️ Imprimer / PDF</button>
+      <button class="btn btn-save" onclick="saveDevisEntry('fp')">💾 Enregistrer & PDF</button>
+      <button class="btn btn-primary" onclick="printFP()">🖨️ Imprimer</button>
     </div>
   </div>
 </div>
@@ -1080,7 +1100,8 @@ select{
     </div>
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('pondeuses')">Fermer</button>
-      <button class="btn btn-primary" onclick="printPondeuses()">🖨️ Imprimer le devis complet</button>
+      <button class="btn btn-save" onclick="saveDevisEntry('pondeuses')">💾 Enregistrer & PDF</button>
+      <button class="btn btn-primary" onclick="printPondeuses()">🖨️ Imprimer</button>
     </div>
   </div>
 </div>
@@ -1111,7 +1132,8 @@ select{
     </div>
     <div class="modal-actions">
       <button class="btn" onclick="closeModal('chairs')">Fermer</button>
-      <button class="btn btn-primary" onclick="printChairs()">🖨️ Imprimer le devis complet</button>
+      <button class="btn btn-save" onclick="saveDevisEntry('chairs')">💾 Enregistrer & PDF</button>
+      <button class="btn btn-primary" onclick="printChairs()">🖨️ Imprimer</button>
     </div>
   </div>
 </div>
@@ -1146,6 +1168,7 @@ var DB = {
   ],
   params:{nom:'',owner:'',ville:'',tel:'',delai:7},
   nextCmd:1, nextMat:1, nextStk:1,
+  devis:[],
   meta:{lastSaved:null,createdAt:null,version:'3.0',firstRun:true}
 };
 var F = {scmd:'',smat:'',scre:''};
@@ -1186,6 +1209,7 @@ function loadDB(){
       DB.nextCmd = p.nextCmd || (DB.commandes.length + 1);
       DB.nextMat = p.nextMat || (DB.materiels.length + 1);
       DB.nextStk = p.nextStk || (DB.stocks.length   + 1);
+      DB.devis   = p.devis   || [];
       if(!localStorage.getItem(STORAGE_KEY)) saveDB();
       return true;
     }
@@ -1196,7 +1220,7 @@ function loadDB(){
 // =============================================
 //  UTILITAIRES
 // =============================================
-function fmt(n){ return Number(n||0).toLocaleString('fr-FR'); }
+function fmt(n){ var x=Math.round(Number(n||0)); return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
 function fmtD(d){ if(!d) return ''; var p=d.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
 function today(){ return new Date().toISOString().split('T')[0]; }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).substr(2,5); }
@@ -1294,6 +1318,7 @@ function renderAll(){
   renderCommandes(); renderMateriels(); renderCreances();
   renderStock(); renderBilan(); renderClients();
   renderParams(); updateAlerts(); updateBadges();
+  renderDevisHistory();
 }
 
 function showTab(name, btn){
@@ -1544,7 +1569,9 @@ function deleteStock(id){if(!confirm('Supprimer cette entrée ?'))return;DB.stoc
 // =============================================
 //  REÇU / BON DE COMMANDE
 // =============================================
+var _rEntry = null, _rType = null;
 function showReceipt(entry, type){
+  _rEntry = entry; _rType = type;
   var nom  = DB.params.nom   || 'GestiPoussin';
   var owner= DB.params.owner || '';
   var ville= DB.params.ville || '';
@@ -1572,6 +1599,213 @@ function showReceipt(entry, type){
   }).join('');
   document.getElementById('rec-total').textContent = fmt(entry.total) + ' FCFA';
   document.getElementById('rec-footer').textContent = 'Édité par ' + (owner||nom) + ' le ' + fmtD(today()) + ' — GestiPoussin v3';
+}
+
+// =============================================
+//  TÉLÉCHARGEMENT PDF REÇU (jsPDF)
+// =============================================
+function downloadReceiptPDF(){
+  if(!_rEntry){toast('⚠ Aucun reçu à télécharger');return;}
+  if(!window.jspdf||!window.jspdf.jsPDF){toast('⚠ PDF indisponible');return;}
+  var jsPDF=window.jspdf.jsPDF;
+  var e=_rEntry, tp=_rType;
+  var nom=DB.params.nom||'GestiPoussin', owner=DB.params.owner||'', ville=DB.params.ville||'', tel=DB.params.tel||'';
+  var doc=new jsPDF({orientation:'portrait',unit:'mm',format:[105,210]});
+  // En-tête
+  doc.setFillColor(45,106,79); doc.rect(0,0,105,28,'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(13); doc.setFont('helvetica','bold');
+  doc.text(nom,52.5,10,{align:'center'});
+  doc.setFontSize(8); doc.setFont('helvetica','normal');
+  if(owner) doc.text(owner,52.5,16,{align:'center'});
+  if(ville||tel) doc.text((ville||'')+(ville&&tel?' · ':'')+tel,52.5,21,{align:'center'});
+  // Titre
+  doc.setTextColor(0,0,0); doc.setFontSize(11); doc.setFont('helvetica','bold');
+  var title=tp==='cmd'?'BON DE COMMANDE':'BON DE VENTE MATÉRIEL';
+  doc.text(title,52.5,36,{align:'center'});
+  doc.setDrawColor(45,106,79); doc.setLineWidth(0.5); doc.line(8,39,97,39);
+  // Lignes
+  var y=47;
+  var rows=[
+    ['Référence', e.ref||'-'],
+    ['Date', fmtD(e.date)],
+    ['Client', e.client],
+    ['Téléphone', e.tel||'-'],
+    [tp==='cmd'?'Race / Souche':'Désignation', tp==='cmd'?e.raceNom:e.designationNom],
+    ['Quantité', fmt(e.qty)+' u.'],
+    ['Prix unitaire', fmt(e.pu)+' FCFA'],
+    ['Total commande', fmt(e.total)+' FCFA'],
+    ['Acompte versé', fmt(e.acompte)+' FCFA'],
+    ['Reste à payer', fmt(e.reste)+' FCFA'],
+    ['Statut', e.statut==='solde'?'Soldé':e.statut==='acompte'?'Acompte partiel':'Crédit']
+  ];
+  if(e.livraison) rows.push(['Livraison prévue',fmtD(e.livraison)]);
+  if(e.echeance)  rows.push(['Échéance paiement',fmtD(e.echeance)]);
+  if(e.notes)     rows.push(['Notes',e.notes]);
+  doc.setFontSize(9);
+  rows.forEach(function(row,i){
+    if(i%2===0){doc.setFillColor(245,242,237);doc.rect(8,y-3.5,89,7,'F');}
+    doc.setFont('helvetica','normal'); doc.setTextColor(110,110,110);
+    doc.text(row[0],10,y+1);
+    doc.setFont('helvetica','bold'); doc.setTextColor(26,23,20);
+    var val=String(row[1]).substring(0,28);
+    doc.text(val,97,y+1,{align:'right'});
+    y+=8;
+  });
+  // Total
+  y+=4;
+  doc.setFillColor(45,106,79); doc.rect(8,y,89,13,'F');
+  doc.setTextColor(255,255,255); doc.setFont('helvetica','bold');
+  doc.setFontSize(9); doc.text('TOTAL',12,y+8);
+  doc.setFontSize(12); doc.text(fmt(e.total)+' FCFA',97,y+8,{align:'right'});
+  // Pied
+  y+=22; doc.setTextColor(150,150,150); doc.setFontSize(7.5); doc.setFont('helvetica','normal');
+  doc.text('Signature client : _______________',12,y);
+  y+=8; doc.text('Édité le '+fmtD(today())+' — GestiPoussin',52.5,y,{align:'center'});
+  doc.save('Recu_'+(e.ref||'client')+'_'+today()+'.pdf');
+  toast('✅ Reçu PDF téléchargé !');
+}
+
+// =============================================
+//  HISTORIQUE DEVIS — SAVE / RENDER / DOWNLOAD
+// =============================================
+function saveDevisEntry(type){
+  var data={};
+  var titre='', client='';
+  if(type==='fp'){
+    var rows=[];
+    document.getElementById('fp-tbody').querySelectorAll('tr').forEach(function(tr){
+      var id=tr.id.replace('fp-row-','');
+      var d=document.getElementById('fp-des-'+id);
+      if(d&&d.value.trim()) rows.push({qty:document.getElementById('fp-qty-'+id).value,des:d.value,pu:document.getElementById('fp-pu-'+id).value});
+    });
+    data={
+      titre:document.getElementById('fp-titre').value||'Facture Pro-Forma',
+      client:document.getElementById('fp-client').value||'',
+      contact:document.getElementById('fp-contact').value||'',
+      date:document.getElementById('fp-date').value||today(),
+      mdo:document.getElementById('fp-mdo').value||0,
+      rows:rows
+    };
+    titre=data.titre; client=data.client;
+    printFP();
+  } else if(type==='pondeuses'){
+    data={
+      client:document.getElementById('pnd-client').value||'',
+      contact:document.getElementById('pnd-contact').value||'',
+      date:document.getElementById('pnd-date').value||today(),
+      lieu:document.getElementById('pnd-lieu').value||'',
+      effectif:document.getElementById('pnd-effectif').value||10000,
+      prix_poussin:document.getElementById('pnd-prix-poussin').value||1150,
+      mort1:document.getElementById('pnd-mort1').value||5,
+      mort2:document.getElementById('pnd-mort2').value||5,
+      oeufs:document.getElementById('pnd-oeufs').value||295,
+      prix_oeuf:document.getElementById('pnd-prix-oeuf').value||80,
+      prix_reforme:document.getElementById('pnd-prix-reforme').value||4000,
+      densite:document.getElementById('pnd-densite').value||5
+    };
+    titre='Devis Pondeuses ('+data.effectif+' têtes)'; client=data.client;
+    printPondeuses();
+  } else if(type==='chairs'){
+    data={
+      client:document.getElementById('chr-client').value||'',
+      contact:document.getElementById('chr-contact').value||'',
+      date:document.getElementById('chr-date').value||today(),
+      lieu:document.getElementById('chr-lieu').value||'',
+      effectif:document.getElementById('chr-effectif').value||1000,
+      prix_poussin:document.getElementById('chr-prix-poussin').value||650,
+      mort:document.getElementById('chr-mort').value||5,
+      prix_vente:document.getElementById('chr-prix-vente').value||2300,
+      bandes:document.getElementById('chr-bandes').value||7,
+      age:document.getElementById('chr-age').value||35
+    };
+    titre='Devis Chairs ('+data.effectif+' têtes)'; client=data.client;
+    printChairs();
+  }
+  DB.devis.unshift({id:uid(),type:type,titre:titre,client:client,date:data.date||today(),savedAt:new Date().toISOString(),data:data});
+  saveDB(); renderDevisHistory();
+  toast('✅ Devis enregistré !');
+}
+
+function redownloadDevis(id){
+  var dv=DB.devis.find(function(x){return x.id===id;});
+  if(!dv){toast('❌ Devis introuvable');return;}
+  var d=dv.data;
+  if(dv.type==='fp'){
+    document.getElementById('fp-titre').value=d.titre||'';
+    document.getElementById('fp-client').value=d.client||'';
+    document.getElementById('fp-contact').value=d.contact||'';
+    document.getElementById('fp-date').value=d.date||today();
+    document.getElementById('fp-mdo').value=d.mdo||0;
+    var tbody=document.getElementById('fp-tbody');
+    tbody.innerHTML='';
+    (d.rows||[]).forEach(function(r){
+      addFPRow();
+      var rid=fpRowCount;
+      document.getElementById('fp-qty-'+rid).value=r.qty||'';
+      document.getElementById('fp-des-'+rid).value=r.des||'';
+      document.getElementById('fp-pu-'+rid).value=r.pu||'';
+    });
+    calcFP(); printFP();
+  } else if(dv.type==='pondeuses'){
+    document.getElementById('pnd-client').value=d.client||'';
+    document.getElementById('pnd-contact').value=d.contact||'';
+    document.getElementById('pnd-date').value=d.date||today();
+    document.getElementById('pnd-lieu').value=d.lieu||'';
+    document.getElementById('pnd-effectif').value=d.effectif||10000;
+    document.getElementById('pnd-prix-poussin').value=d.prix_poussin||1150;
+    document.getElementById('pnd-mort1').value=d.mort1||5;
+    document.getElementById('pnd-mort2').value=d.mort2||5;
+    document.getElementById('pnd-oeufs').value=d.oeufs||295;
+    document.getElementById('pnd-prix-oeuf').value=d.prix_oeuf||80;
+    document.getElementById('pnd-prix-reforme').value=d.prix_reforme||4000;
+    document.getElementById('pnd-densite').value=d.densite||5;
+    calcPondeuses(); printPondeuses();
+  } else if(dv.type==='chairs'){
+    document.getElementById('chr-client').value=d.client||'';
+    document.getElementById('chr-contact').value=d.contact||'';
+    document.getElementById('chr-date').value=d.date||today();
+    document.getElementById('chr-lieu').value=d.lieu||'';
+    document.getElementById('chr-effectif').value=d.effectif||1000;
+    document.getElementById('chr-prix-poussin').value=d.prix_poussin||650;
+    document.getElementById('chr-mort').value=d.mort||5;
+    document.getElementById('chr-prix-vente').value=d.prix_vente||2300;
+    document.getElementById('chr-bandes').value=d.bandes||7;
+    document.getElementById('chr-age').value=d.age||35;
+    calcChairs(); printChairs();
+  }
+  toast('✅ PDF régénéré !');
+}
+
+function deleteDevis(id){
+  if(!confirm('Supprimer ce devis de l\'historique ?')) return;
+  DB.devis=DB.devis.filter(function(x){return x.id!==id;});
+  saveDB(); renderDevisHistory();
+  toast('Devis supprimé');
+}
+
+function renderDevisHistory(){
+  var list=document.getElementById('devis-history-list');
+  var none=document.getElementById('no-devis');
+  if(!list) return;
+  if(!DB.devis||!DB.devis.length){list.innerHTML='';if(none)none.style.display='block';return;}
+  if(none) none.style.display='none';
+  var icons={fp:'📄',pondeuses:'🐔',chairs:'🐥'};
+  var labels={fp:'Facture Pro-Forma',pondeuses:'Devis Pondeuses',chairs:'Devis Poulets de Chair'};
+  list.innerHTML=DB.devis.map(function(dv){
+    var d=new Date(dv.savedAt);
+    var dateStr=d.toLocaleDateString('fr-FR')+' à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    return '<div class="devis-hist-item">'
+      +'<div class="devis-hist-icon">'+(icons[dv.type]||'📄')+'</div>'
+      +'<div class="devis-hist-info">'
+        +'<div class="devis-hist-title">'+(dv.titre||labels[dv.type]||'Devis')+'</div>'
+        +'<div class="devis-hist-meta">'+(dv.client?dv.client+' · ':'')+labels[dv.type]+' · Enregistré le '+dateStr+'</div>'
+      +'</div>'
+      +'<div class="devis-hist-actions">'
+        +'<button class="btn btn-sm btn-primary" onclick="redownloadDevis(\''+dv.id+'\')" title="Télécharger PDF">📥 PDF</button>'
+        +'<button class="btn btn-sm btn-danger" onclick="deleteDevis(\''+dv.id+'\')" title="Supprimer">✕</button>'
+      +'</div>'
+      +'</div>';
+  }).join('');
 }
 
 // =============================================
