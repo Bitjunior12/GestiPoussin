@@ -1329,6 +1329,7 @@ function calcStk(){ var q=parseFloat(document.getElementById('stk-qty').value)||
 //  MODALS
 // =============================================
 function openModal(type,id){
+  populateSelects();
   if(type==='commande'){
     var ei=id?DB.commandes.find(function(x){return x.id===id;}):null;
     document.getElementById('edit-cmd-id').value=id||'';
@@ -2391,7 +2392,7 @@ function printChairs(){
 // =============================================
 //  LANCEMENT
 // =============================================
-window.addEventListener('DOMContentLoaded', init);
+init();
 
 </script>
 <script>
