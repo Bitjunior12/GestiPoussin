@@ -339,6 +339,99 @@ select{
   appearance:auto !important;
   -webkit-appearance:menulist !important;
 }
+
+/* ====== RESPONSIVE ====== */
+
+/* --- Tablet (≤768px) --- */
+@media(max-width:768px){
+  .page{padding:10px 8px;}
+  .metrics{grid-template-columns:repeat(2,1fr);gap:8px;}
+  .metric-value{font-size:18px;}
+  .section-head{flex-wrap:wrap;gap:6px;}
+  .section-head h2{font-size:14px;}
+  .filter-bar{flex-wrap:wrap;gap:6px;}
+  .date-filter{flex-wrap:wrap;gap:4px;}
+  .bilan-grid{grid-template-columns:1fr;}
+  .stock-summary{grid-template-columns:repeat(2,1fr);}
+  .chart-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .devis-type-grid{grid-template-columns:1fr 1fr;}
+}
+
+/* --- Mobile (≤600px) --- */
+@media(max-width:600px){
+  .header{padding:0 10px;gap:6px;}
+  .logo-name{font-size:14px;}
+  .logo-sub{display:none;}
+  .header-right{gap:4px;}
+  .btn.btn-sm{padding:5px 8px;font-size:11px;}
+
+  .tabs-bar{padding:0 4px;gap:4px;}
+  .tab-btn{padding:6px 10px;font-size:11px;}
+
+  .page{padding:8px 6px;}
+
+  /* Métriques : 2 colonnes */
+  .metrics{grid-template-columns:repeat(2,1fr);gap:6px;}
+  .metric-value{font-size:16px;}
+  .metric-label{font-size:10px;}
+  .metric-icon{font-size:18px;}
+
+  /* Tables → scroll horizontal */
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);}
+  table{min-width:520px;font-size:12px;}
+  th,td{padding:7px 8px;font-size:11px;}
+
+  /* Formulaires : 1 colonne */
+  .form-row{grid-template-columns:1fr !important;}
+  .form-row.tri{grid-template-columns:1fr !important;}
+  .form-row.full{grid-template-columns:1fr;}
+
+  /* Stock summary : 2 colonnes */
+  .stock-summary{grid-template-columns:repeat(2,1fr);gap:6px;}
+
+  /* Bilan */
+  .bilan-grid{grid-template-columns:1fr;}
+
+  /* Charts */
+  .chart-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .chart-bars{min-width:260px;}
+
+  /* Modals */
+  .modal{padding:16px 12px;max-height:95vh;}
+  .modal-title{font-size:14px;}
+  .modal-actions{flex-direction:column-reverse;gap:6px;}
+  .modal-actions .btn{width:100%;justify-content:center;}
+
+  /* Devis */
+  .devis-type-grid{grid-template-columns:1fr;}
+  .devis-kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .devis-form-grid{grid-template-columns:1fr !important;}
+
+  /* Alertes */
+  .alert-item{flex-direction:column;align-items:flex-start;gap:4px;}
+  .relance-actions{flex-wrap:wrap;}
+
+  /* Boutons section */
+  .section-head{flex-direction:column;align-items:flex-start;gap:8px;}
+  .section-head .btn{width:100%;text-align:center;}
+  .section-head h2{font-size:14px;}
+
+  /* Filtres */
+  .filter-bar{flex-direction:column;gap:6px;}
+  .filter-bar input,.filter-bar select{width:100%;}
+  .date-filter{flex-wrap:wrap;gap:4px;}
+  .date-filter input{flex:1;min-width:110px;}
+}
+
+/* --- Très petit (≤380px) --- */
+@media(max-width:380px){
+  .metrics{grid-template-columns:1fr 1fr;}
+  .metric-value{font-size:14px;}
+  table{min-width:480px;font-size:11px;}
+  th,td{padding:5px 6px;}
+  .tab-btn{padding:5px 7px;font-size:10px;}
+  .stock-summary{grid-template-columns:1fr 1fr;}
+}
 </style>
 </style>
 </head>
