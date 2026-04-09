@@ -469,7 +469,7 @@ select{
     <div style="display:flex;align-items:center;gap:4px;cursor:pointer" onclick="showTab('params',null)" title="Statut sauvegarde">
       <div class="save-dot" id="save-dot"></div>
     </div>
-    <button class="btn btn-sm btn-save" onclick="exportData()" title="Backup JSON">💾</button>
+    <button class="btn btn-sm btn-save" onclick="exportPDF()" title="Télécharger rapport PDF">📄</button>
     <button class="btn btn-sm" onclick="logout()" title="Déconnexion" style="background:#FDF0E3;color:#E07C2A;border-color:#F5D5B0">🔒</button>
     <button class="btn btn-sm btn-primary" onclick="openModal('commande')">+ Vente</button>
   </div>
@@ -683,15 +683,14 @@ select{
       <div style="background:var(--accent-light);border-radius:var(--rs);padding:12px;font-size:13px;color:var(--accent);line-height:1.7">
         <strong>✅ Sauvegarde automatique active</strong><br>
         Chaque modification est enregistrée instantanément. Vider le cache ou changer de navigateur efface les données.<br>
-        <span style="color:var(--warn)">⚠ Exportez un fichier JSON <strong>chaque semaine</strong> pour ne jamais rien perdre.</span>
+        <span style="color:var(--warn)">⚠ Téléchargez le rapport PDF <strong>chaque semaine</strong> pour garder une trace de vos données.</span>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-save" onclick="exportData()">📤 Exporter sauvegarde JSON</button>
-        <button class="btn" onclick="document.getElementById('import-file').click()">📥 Restaurer depuis JSON</button>
         <button class="btn btn-danger" onclick="exportPDF()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          Rapport PDF
+          Télécharger rapport PDF
         </button>
+        <button class="btn" onclick="document.getElementById('import-file').click()">📥 Restaurer données</button>
         <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
       </div>
       <div style="font-size:12px;color:var(--text3)" id="last-export-info">Dernière exportation : jamais</div>
@@ -991,7 +990,7 @@ select{
         <div style="color:var(--text2);line-height:1.7">
           → Allez dans <strong>Paramètres</strong> pour définir les prix de vos races<br>
           → Enregistrez une commande test pour vous familiariser<br>
-          → Exportez un backup JSON chaque semaine
+          → Téléchargez le rapport PDF chaque semaine
         </div>
       </div>
       <div class="ob-actions"><button class="btn btn-primary" style="padding:12px 32px;font-size:14px" onclick="closeOnboarding()">Démarrer l'application 🚀</button></div>
@@ -1004,9 +1003,9 @@ select{
   <div class="modal" style="max-width:400px;text-align:center;padding:32px 24px">
     <div style="font-size:40px;margin-bottom:12px">💾</div>
     <div style="font-size:17px;font-weight:700;margin-bottom:8px">Temps de sauvegarder !</div>
-    <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:24px">Tes données sont en sécurité dans le navigateur, mais un fichier JSON hebdomadaire te protège contre tout incident.<br><br><strong>Envoie ce fichier à toi-même sur WhatsApp ou mets-le sur une clé USB.</strong></div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:24px">Tes données sont en sécurité dans le navigateur. Télécharge le rapport PDF pour garder une trace de toutes tes activités.<br><br><strong>Envoie ce PDF à toi-même sur WhatsApp ou mets-le sur une clé USB.</strong></div>
     <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-      <button class="btn btn-primary" onclick="exportDataFromReminder()">📤 Exporter maintenant</button>
+      <button class="btn btn-primary" onclick="dismissBackupReminder();exportPDF();">📄 Télécharger rapport PDF</button>
       <button class="btn" onclick="dismissBackupReminder()">Plus tard</button>
     </div>
     <div style="font-size:11px;color:var(--text3);margin-top:14px">Rappel tous les 7 jours</div>
@@ -1262,7 +1261,7 @@ function exportDataFromReminder(){ dismissBackupReminder(); exportData(); }
 function showBackupBanner(){
   var zone=document.getElementById('backup-reminder-zone'); if(!zone) return;
   if(shouldShowBackup()){
-    zone.innerHTML='<div class="backup-banner"><span>⚠ Dernière sauvegarde : '+fmtLastExport()+'</span><button class="btn btn-sm btn-warn" onclick="exportData()">💾 Exporter</button></div>';
+    zone.innerHTML='<div class="backup-banner"><span>⚠ Dernier rapport : '+fmtLastExport()+'</span><button class="btn btn-sm btn-warn" onclick="exportPDF()">📄 Rapport PDF</button></div>';
   } else { zone.innerHTML=''; }
 }
 
@@ -1890,7 +1889,10 @@ function exportPDF(){
   }
   var pg=doc.getNumberOfPages();
   for(var i=1;i<=pg;i++){doc.setPage(i);doc.setFontSize(7.5);doc.setTextColor(150,150,150);doc.text('GestiPoussin v3 · '+nom+' · '+fmtD(today()),14,291);doc.text('Page '+i+'/'+pg,196,291,{align:'right'});}
-  doc.save('GestiPoussin_Rapport_'+today()+'.pdf');toast('✅ Rapport PDF exporté !');
+  doc.save('GestiPoussin_Rapport_'+today()+'.pdf');
+  localStorage.setItem(BACKUP_KEY,Date.now().toString());
+  updateLastExportInfo();showBackupBanner();
+  toast('✅ Rapport PDF téléchargé !');
 }
 
 
